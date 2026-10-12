@@ -3,66 +3,80 @@ let currentLesson = null;
 let currentStepIndex = 0;
 let userAnswers = [];
 
+function createErrorEl(form) {
+  let el = form.querySelector('.form-error');
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'form-error';
+    el.style.color = '#dc2626';
+    el.style.marginTop = '0.5rem';
+    el.style.fontSize = '0.9rem';
+    form.appendChild(el);
+  }
+  return el;
+}
+
 // DOM Elements
 document.addEventListener('DOMContentLoaded', function() {
     // Login Form Handling
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Simple validation
-            if (email && password) {
-                // In a real app, you would send this to a server
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userEmail', email);
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Пожалуйста, заполните все поля');
-            }
-        });
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorEl = createErrorEl(loginForm);
+        if (!email || !password) {
+          errorEl.textContent = 'Заполните все поля';
+          return;
+        }
+        try {
+          const data = await apiLogin(email, password);
+          saveToken(data.token, { name: data.name, email: data.email });
+          window.location.href = 'dashboard.html';
+        } catch (err) {
+          errorEl.textContent = err.message;
+        }
+      });
     }
 
     // Registration Form Handling
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Simple validation
-            if (password !== confirmPassword) {
-                alert('Пароли не совпадают');
-                return;
-            }
-            
-            if (name && email && password) {
-                // In a real app, you would send this to a server
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userName', name);
-                localStorage.setItem('userEmail', email);
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Пожалуйста, заполните все поля');
-            }
-        });
+      registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorEl = createErrorEl(registerForm);
+        if (password !== confirmPassword) {
+          errorEl.textContent = 'Пароли не совпадают';
+          return;
+        }
+        if (!name || !email || !password) {
+          errorEl.textContent = 'Заполните все поля';
+          return;
+        }
+        try {
+          await apiRegister(email, password, name);
+          const data = await apiLogin(email, password);
+          saveToken(data.token, { name: data.name, email: data.email });
+          window.location.href = 'dashboard.html';
+        } catch (err) {
+          errorEl.textContent = err.message;
+        }
+      });
     }
 
     // Logout Handling
     const logoutLink = document.getElementById('logoutLink');
     if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userEmail');
-            window.location.href = 'index.html';
-        });
+      logoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        clearAuth();
+        window.location.href = 'index.html';
+      });
     }
 
     // Display user name in dashboard
@@ -70,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (userNameElement) {
         const storedName = localStorage.getItem('userName');
         const storedEmail = localStorage.getItem('userEmail');
-        
+
         if (storedName) {
             userNameElement.textContent = storedName;
         } else if (storedEmail) {
@@ -85,10 +99,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is logged in for protected pages
     const dashboardSection = document.querySelector('.dashboard-section');
     if (dashboardSection) {
-        const isLoggedIn = localStorage.getItem('isLoggedIn');
-        if (!isLoggedIn) {
-            window.location.href = 'login.html';
+      apiGetMe().then(user => {
+        if (!user) {
+          window.location.href = 'login.html';
         }
+      });
     }
 });
 
