@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html" class="nav-link">← Назад к урокам</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="lesson-section">
+            <div class="container">
+                <!-- Progress bar -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Шаг 1 из 6</div>
+                </div>
+
+                <!-- Lesson content -->
+                <div class="lesson-content-container">
+                    <h2 id="lessonTitle">Загрузка урока...</h2>
+                    
+                    <div id="lessonContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                    
+                    <div class="lesson-navigation">
+                        <button id="prevButton" class="btn btn-secondary">Назад</button>
+                        <button id="nextButton" class="btn btn-primary">Далее</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/lesson-loader.js"></script>
+</body>
+</html>
