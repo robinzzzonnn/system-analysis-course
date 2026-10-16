@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const { Driver } = require('@ydbjs/core');
 const { query } = require('@ydbjs/query');
 const { ServiceAccountCredentialsProvider } = require('@ydbjs/auth-yandex-cloud');
-const { MetadataCredentialsProvider } = require('@ydbjs/auth/metadata');
-const { EnvironCredentialsProvider } = require('@ydbjs/auth/environ');
 const { getYdbSql, runWithYdbSql } = require('@rodnoycry/ydb-faas');
 require('dotenv').config();
 
@@ -18,8 +16,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production';
 
 // Регистрация
 app.post('/api/register', async (req, res) => {
+  // Выбор провайдера аутентификации в зависимости от окружения
+  let credentialsProvider;
+  if (process.env.NODE_ENV === 'production') {
+    // В облаке — метаданные
+    const { MetadataCredentialsProvider } = require('@ydbjs/auth/metadata');
+    credentialsProvider = new MetadataCredentialsProvider();
+  } else {
+    // Локально — файл ключа
+    credentialsProvider = ServiceAccountCredentialsProvider.fromFile('./authorized_key.json');
+  }
+
   const driver = new Driver(process.env.YDB_CONNECTION_STRING, {
-    credentialsProvider: new EnvironCredentialsProvider(),
+    credentialsProvider,
   });
   try {
     await driver.ready();
@@ -58,8 +67,19 @@ app.post('/api/register', async (req, res) => {
 
 // Вход
 app.post('/api/login', async (req, res) => {
+  // Выбор провайдера аутентификации в зависимости от окружения
+  let credentialsProvider;
+  if (process.env.NODE_ENV === 'production') {
+    // В облаке — метаданные
+    const { MetadataCredentialsProvider } = require('@ydbjs/auth/metadata');
+    credentialsProvider = new MetadataCredentialsProvider();
+  } else {
+    // Локально — файл ключа
+    credentialsProvider = ServiceAccountCredentialsProvider.fromFile('./authorized_key.json');
+  }
+
   const driver = new Driver(process.env.YDB_CONNECTION_STRING, {
-    credentialsProvider: new EnvironCredentialsProvider(),
+    credentialsProvider,
   });
   try {
     await driver.ready();
@@ -107,8 +127,19 @@ app.post('/api/login', async (req, res) => {
 
 // Проверка токена
 app.get('/api/me', async (req, res) => {
+  // Выбор провайдера аутентификации в зависимости от окружения
+  let credentialsProvider;
+  if (process.env.NODE_ENV === 'production') {
+    // В облаке — метаданные
+    const { MetadataCredentialsProvider } = require('@ydbjs/auth/metadata');
+    credentialsProvider = new MetadataCredentialsProvider();
+  } else {
+    // Локально — файл ключа
+    credentialsProvider = ServiceAccountCredentialsProvider.fromFile('./authorized_key.json');
+  }
+
   const driver = new Driver(process.env.YDB_CONNECTION_STRING, {
-    credentialsProvider: new EnvironCredentialsProvider(),
+    credentialsProvider,
   });
   try {
     await driver.ready();
