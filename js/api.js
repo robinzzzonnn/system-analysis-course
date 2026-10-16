@@ -58,3 +58,35 @@ async function apiGetMe() {
     return null;
   }
 }
+
+async function apiUpdateProfile(name, email) {
+  const token = getToken();
+  const response = await fetch(`${API_URL}/api/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ name, email }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Ошибка обновления');
+
+  // Обновить токен в localStorage, если он был возвращён
+  if (data.token) {
+    localStorage.setItem('auth_token', data.token);
+  }
+
+  // Обновить данные пользователя
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  user.name = data.name;
+  user.email = data.email;
+  localStorage.setItem('user', JSON.stringify(user));
+  
+  // Also update the legacy user info storage for backward compatibility
+  localStorage.setItem('userName', data.name);
+  localStorage.setItem('userEmail', data.email);
+  localStorage.setItem('isLoggedIn', 'true');
+  
+  return data;
+}

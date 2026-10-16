@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="dashboard.html" class="nav-link">Курс</a>
+                <a href="simulator.html" class="nav-link">Тренажёр</a>
+                <a href="profile.html" class="nav-link active">Профиль</a>
+                <a href="#" class="nav-link" id="logoutLink">Выход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="dashboard-section">
+            <div class="container">
+                <h2>Профиль пользователя</h2>
+                
+                <div class="profile-form-container">
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="name">Имя</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            <button type="button" id="cancelBtn" class="btn btn-secondary">Отмена</button>
+                        </div>
+                        <div id="messageContainer" class="form-message"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authorization
+            const user = await apiGetMe();
+            if (user === null) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Fill form with current user data
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+
+            // Setup form submission
+            const form = document.getElementById('profileForm');
+            const messageContainer = document.getElementById('messageContainer');
+            const saveBtn = document.querySelector('button[type="submit"]');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Store original button text
+                const originalBtnText = saveBtn.textContent;
+                
+                // Disable all inputs and show loading state
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="spinner"></span>Сохранение...';
+                cancelBtn.disabled = true;
+                nameInput.disabled = true;
+                emailInput.disabled = true;
+                
+                try {
+                    const result = await apiUpdateProfile(nameInput.value, emailInput.value);
+                    messageContainer.className = 'form-message success';
+                    messageContainer.textContent = 'Профиль обновлён';
+                    
+                    // Update displayed user info in case of changes
+                    nameInput.value = result.name;
+                    emailInput.value = result.email;
+                } catch (error) {
+                    messageContainer.className = 'form-message error';
+                    messageContainer.textContent = error.message;
+                } finally {
+                    // Re-enable all inputs and restore button
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalBtnText;
+                    cancelBtn.disabled = false;
+                    nameInput.disabled = false;
+                    emailInput.disabled = false;
+                }
+            });
+
+            // Setup cancel button
+            document.getElementById('cancelBtn').addEventListener('click', function() {
+                nameInput.value = user.name;
+                emailInput.value = user.email;
+                messageContainer.className = 'form-message';
+                messageContainer.textContent = '';
+            });
+        });
+
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            clearAuth();
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

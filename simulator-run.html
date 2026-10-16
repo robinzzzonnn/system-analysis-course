@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="dashboard.html" class="nav-link">Уроки</a>
+                <a href="simulator.html" class="nav-link">Тренажёр</a>
+                <a href="profile.html" class="nav-link active">Профиль</a>
+                <a href="#" class="nav-link" id="logoutLink">Выход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="lesson-section">
+            <div class="container">
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Этап 1 из 5</div>
+                </div>
+
+                <!-- Simulator Content Area -->
+                <div class="lesson-content-container">
+                    <div id="simulatorContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="lesson-navigation">
+                    <button class="btn btn-secondary" id="prevBtn">Назад</button>
+                    <button class="btn btn-primary" id="nextBtn">Далее</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Global variables
+        let currentSimulator = null;
+        let currentStageIndex = 0;
+        let stageHistory = [];
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authorization first
+            apiGetMe().then(user => {
+                if (user === null) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Get simulator ID from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const simulatorId = parseInt(urlParams.get('id'));
+
+                if (simulatorId) {
+                    // Load simulator content
+                    loadSimulator(simulatorId);
+                }
+
+                // Setup navigation buttons
+                document.getElementById('prevBtn').addEventListener('click', goToPreviousStage);
+                document.getElementById('nextBtn').addEventListener('click', goToNextStage);
+            });
+        });
+
+        // Load simulator data
+        function loadSimulator(simulatorId) {
+            fetch('simulators.json')
+                .then(response => response.json())
+                .then(data => {
+                    const simulator = data.simulators.find(s => s.id === simulatorId);
+                    if (simulator) {
+                        currentSimulator = simulator;
+                        renderStage();
+                    } else {
+                        document.getElementById('simulatorContent').innerHTML = '<p>Ошибка: Тренажёр не найден.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки тренажёра:', error);
+                    document.getElementById('simulatorContent').innerHTML = '<p>Ошибка загрузки тренажёра. Попробуйте обновить страницу.</p>';
+                });
+        }
+
+        // Render current stage
+        function renderStage() {
+            if (!currentSimulator || currentStageIndex < 0 || currentStageIndex >= currentSimulator.stages.length) {
+                return;
+            }
+
+            const stage = currentSimulator.stages[currentStageIndex];
+            const contentElement = document.getElementById('simulatorContent');
+
+            // Update progress bar
+            updateProgress();
+
+            // Replace {userName} with actual user name
+            const userName = getUserName();
+
+            // Render based on stage type
+            switch(stage.type) {
+                case 'dialogue':
+                    renderDialogueStage(stage, userName);
+                    break;
+                case 'input':
+                    renderInputStage(stage, userName);
+                    break;
+                case 'summary':
+                    renderSummaryStage(stage, userName);
+                    break;
+                default:
+                    contentElement.innerHTML = '<p>Неизвестный тип этапа.</p>';
+            }
+
+            // Update navigation buttons
+            updateNavigationButtons();
+        }
+
+        // Render dialogue stage
+        function renderDialogueStage(stage, userName) {
+            let message = stage.message.replace('{userName}', userName);
+
+            let html = `
+                <div class="simulator-dialogue">
+                    <div class="simulator-avatar">${stage.avatar}</div>
+                    <div class="simulator-speaker">${stage.speaker}</div>
+                    <div class="simulator-message">${message}</div>
+            `;
+
+            // Add choices if they exist
+            if (stage.choices && stage.choices.length > 0) {
+                html += '<div class="simulator-choices">';
+                stage.choices.forEach((choice, index) => {
+                    html += `<button class="simulator-choice btn btn-secondary" data-choice-index="${index}">${choice.text}</button>`;
+                });
+                html += '</div>';
+
+                // Add feedback container (hidden by default)
+                html += '<div class="simulator-feedback" id="feedbackContainer" style="display: none;"></div>';
+            } else {
+                // Add next button if no choices
+                html += '<button class="btn btn-primary" id="dialogueNextBtn" style="margin-top: 20px;">Далее</button>';
+            }
+
+            html += '</div>';
+
+            document.getElementById('simulatorContent').innerHTML = html;
+
+            // Add event listeners
+            if (stage.choices && stage.choices.length > 0) {
+                document.querySelectorAll('.simulator-choice').forEach(button => {
+                    button.addEventListener('click', handleChoiceClick);
+                });
+            } else {
+                document.getElementById('dialogueNextBtn').addEventListener('click', () => {
+                    navigateToStage(stage.next);
+                });
+            }
+        }
+
+        // Handle choice click
+        function handleChoiceClick(event) {
+            const choiceIndex = parseInt(event.target.dataset.choiceIndex);
+            const stage = currentSimulator.stages[currentStageIndex];
+            const choice = stage.choices[choiceIndex];
+
+            // Show feedback
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            feedbackContainer.style.display = 'block';
+            feedbackContainer.className = 'simulator-feedback ' + (choice.isCorrect ? 'correct' : 'incorrect');
+            feedbackContainer.innerHTML = choice.feedback;
+
+            // Disable all choice buttons
+            document.querySelectorAll('.simulator-choice').forEach(button => {
+                button.disabled = true;
+            });
+
+            // Navigate to next stage after delay
+            setTimeout(() => {
+                navigateToStage(choice.next);
+            }, 2000);
+        }
+
+        // Render input stage
+        function renderInputStage(stage, userName) {
+            let html = `
+                <div class="simulator-input-container">
+                    <h3>${stage.question}</h3>
+                    <textarea
+                        id="requirementInput"
+                        placeholder="${stage.placeholder}"
+                        class="simulator-input"
+                        rows="4"></textarea>
+                    <div class="form-group">
+                        <small class="form-hint">${stage.hint}</small>
+                    </div>
+                    <button class="btn btn-primary" id="checkRequirementBtn">Проверить</button>
+                    <div class="simulator-feedback" id="inputFeedback" style="display: none; margin-top: 20px;"></div>
+                    <div id="nextButtonContainer" style="display: none; margin-top: 20px;">
+                        <button class="btn btn-primary" id="inputNextBtn">Далее</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('simulatorContent').innerHTML = html;
+
+            // Add event listeners
+            document.getElementById('checkRequirementBtn').addEventListener('click', () => {
+                validateInput(stage);
+            });
+
+            document.getElementById('inputNextBtn').addEventListener('click', () => {
+                navigateToStage(stage.next);
+            });
+        }
+
+        // Validate input
+        function validateInput(stage) {
+            const input = document.getElementById('requirementInput').value.trim();
+            const feedbackContainer = document.getElementById('inputFeedback');
+            const nextButtonContainer = document.getElementById('nextButtonContainer');
+
+            // Check minimum length
+            if (input.length < stage.validation.minLength) {
+                feedbackContainer.className = 'simulator-feedback incorrect';
+                feedbackContainer.innerHTML = `Попробуй ещё! Ответ должен содержать минимум ${stage.validation.minLength} символов.`;
+                feedbackContainer.style.display = 'block';
+                nextButtonContainer.style.display = 'none';
+                return;
+            }
+
+            // Check keywords
+            let keywordCount = 0;
+            stage.validation.keywords.forEach(keyword => {
+                if (input.toLowerCase().includes(keyword.toLowerCase())) {
+                    keywordCount++;
+                }
+            });
+
+            if (keywordCount < stage.validation.minKeywords) {
+                feedbackContainer.className = 'simulator-feedback incorrect';
+                feedbackContainer.innerHTML = `Попробуй ещё! Попробуй использовать больше ключевых слов: ${stage.validation.keywords.join(', ')}.`;
+                feedbackContainer.style.display = 'block';
+                nextButtonContainer.style.display = 'none';
+                return;
+            }
+
+            // Valid input
+            feedbackContainer.className = 'simulator-feedback correct';
+            feedbackContainer.innerHTML = `
+                <p>Решение засчитано!</p>
+                <p><strong>Пример правильного ответа:</strong></p>
+                <p>${stage.correctExample}</p>
+            `;
+            feedbackContainer.style.display = 'block';
+            nextButtonContainer.style.display = 'block';
+        }
+
+        // Render summary stage
+        function renderSummaryStage(stage, userName) {
+            let message = stage.message.replace('{userName}', userName);
+
+            let html = `
+                <div class="simulator-summary">
+                    <h2>Поздравляем!</h2>
+                    <p>${message}</p>
+                    <h3>Что вы изучили:</h3>
+                    <ul>
+            `;
+
+            stage.learned.forEach(item => {
+                html += `<li>${item}</li>`;
+            });
+
+            html += `
+                    </ul>
+                    <button class="btn btn-primary" id="returnToSimulatorsBtn">Вернуться к тренажёрам</button>
+                </div>
+            `;
+
+            document.getElementById('simulatorContent').innerHTML = html;
+
+            // Add event listener
+            document.getElementById('returnToSimulatorsBtn').addEventListener('click', () => {
+                window.location.href = 'simulator.html';
+            });
+        }
+
+        // Navigate to a specific stage by ID
+        function navigateToStage(stageId) {
+            if (!stageId) return;
+
+            const stageIndex = currentSimulator.stages.findIndex(s => s.id === stageId);
+            if (stageIndex !== -1) {
+                // Save current stage to history
+                stageHistory.push(currentStageIndex);
+                currentStageIndex = stageIndex;
+                renderStage();
+            }
+        }
+
+        // Go to previous stage
+        function goToPreviousStage() {
+            if (stageHistory.length > 0) {
+                currentStageIndex = stageHistory.pop();
+                renderStage();
+            }
+        }
+
+        // Go to next stage
+        function goToNextStage() {
+            if (currentStageIndex < currentSimulator.stages.length - 1) {
+                // Save current stage to history
+                stageHistory.push(currentStageIndex);
+                currentStageIndex++;
+                renderStage();
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progressPercent = ((currentStageIndex + 1) / currentSimulator.stages.length) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            document.getElementById('progressText').textContent = `Этап ${currentStageIndex + 1} из ${currentSimulator.stages.length}`;
+        }
+
+        // Update navigation buttons
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Previous button
+            if (stageHistory.length > 0) {
+                prevBtn.disabled = false;
+            } else {
+                prevBtn.disabled = true;
+            }
+
+            // Next button - disable on summary stage
+            if (currentSimulator.stages[currentStageIndex].type === 'summary') {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Get user name from localStorage
+        function getUserName() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('user'));
+                return userData && userData.name ? userData.name : 'Аналитик';
+            } catch (e) {
+                return 'Аналитик';
+            }
+        }
+
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

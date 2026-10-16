@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор режима | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="dashboard.html" class="nav-link">Курс</a>
+                <a href="simulator.html" class="nav-link">Тренажёр</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+                <a href="#" class="nav-link" id="logoutLink">Выход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="dashboard-section">
+            <div class="container">
+                <h2>Куда хочешь пойти?</h2>
+                
+                <div class="lessons-section">
+                    <div class="lessons-list">
+                        <!-- Course Card -->
+                        <div class="lesson-card" style="cursor: pointer;" onclick="window.location.href='dashboard.html'">
+                            <div class="lesson-content">
+                                <h4>Курс</h4>
+                                <p>Теоретическая база: 5 уроков с заданиями и теорией</p>
+                            </div>
+                            <div class="lesson-status">
+                                <button class="btn btn-primary">Перейти к курсу</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Simulator Card -->
+                        <div class="lesson-card" style="cursor: pointer;" onclick="window.location.href='simulator.html'">
+                            <div class="lesson-content">
+                                <h4>Тренажёр</h4>
+                                <p>Симуляция реальных проектов: сбор требований, документирование</p>
+                            </div>
+                            <div class="lesson-status">
+                                <button class="btn btn-primary">Перейти к тренажёру</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

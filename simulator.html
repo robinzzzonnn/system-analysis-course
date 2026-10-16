@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="dashboard.html" class="nav-link">Уроки</a>
+                <a href="simulator.html" class="nav-link active">Тренажёр</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+                <a href="#" class="nav-link" id="logoutLink">Выход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="dashboard-section">
+            <div class="container">
+                <h2>Тренажёр системного аналитика</h2>
+                <div class="welcome-message">
+                    <p>Пройди реальный проект от постановки задачи до документирования</p>
+                </div>
+
+                <div class="lessons-section">
+                    <h3>Доступные тренажёры</h3>
+                    <div class="lessons-list" id="simulatorsContainer">
+                        <!-- Simulators will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Load simulators dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            apiGetMe().then(user => {
+                if (user === null) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                loadSimulators();
+            });
+        });
+
+        function loadSimulators() {
+            fetch('simulators.json')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('simulatorsContainer');
+                    container.innerHTML = '';
+
+                    data.simulators.forEach(simulator => {
+                        const simulatorCard = `
+                            <div class="lesson-card">
+                                <div class="lesson-content">
+                                    <h4>${simulator.title}</h4>
+                                    <p><strong>Компания:</strong> ${simulator.company}</p>
+                                    <p><strong>Роль:</strong> ${simulator.role}</p>
+                                    <p>${simulator.description}</p>
+                                </div>
+                                <div class="lesson-status">
+                                    <button class="btn btn-primary" onclick="startSimulator(${simulator.id})">Начать</button>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += simulatorCard;
+                    });
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки тренажёров:', error);
+                    document.getElementById('simulatorsContainer').innerHTML = '<p>Ошибка загрузки тренажёров. Попробуйте обновить страницу.</p>';
+                });
+        }
+
+        function startSimulator(id) {
+            window.location.href = `simulator-run.html?id=${id}`;
+        }
+
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

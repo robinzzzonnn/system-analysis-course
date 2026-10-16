@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="#" class="nav-link" id="logoutLink">Выход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="dashboard-section">
+            <div class="container">
+                <h2>Личный кабинет</h2>
+                <div class="welcome-message">
+                    <p>Добро пожаловать, <span id="userName">Аналитик</span>!</p>
+                    <p>Продолжайте обучение, изучая материалы курса.</p>
+                </div>
+
+                <div class="lessons-section">
+                    <h3>Материалы курса</h3>
+                    <div class="lessons-list" id="lessonsContainer">
+                        <!-- Lessons will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Load lessons dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLessons();
+        });
+    </script>
+</body>
+</html>

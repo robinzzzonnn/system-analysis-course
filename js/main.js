@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
           const data = await apiLogin(email, password);
           saveToken(data.token, { name: data.name, email: data.email });
-          window.location.href = 'dashboard.html';
+          window.location.href = 'choose.html';
         } catch (err) {
           errorEl.textContent = err.message;
         }
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
           await apiRegister(email, password, name);
           const data = await apiLogin(email, password);
           saveToken(data.token, { name: data.name, email: data.email });
-          window.location.href = 'dashboard.html';
+          window.location.href = 'choose.html';
         } catch (err) {
           errorEl.textContent = err.message;
         }
