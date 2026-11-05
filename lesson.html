@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Урок | Системный анализ с нуля</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/icons.css">
 </head>
 <body>
     <header class="header">
@@ -19,25 +20,25 @@
     </header>
 
     <main class="main">
-        <section class="lesson-section">
+        <section style="padding: 3rem 0;">
             <div class="container">
                 <!-- Progress bar -->
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+                <div style="margin-bottom: 2rem;">
+                    <div style="height: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem;">
+                        <div class="progress-fill" id="progressFill" style="height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); width: 0%; transition: width 0.5s ease;"></div>
                     </div>
-                    <div class="progress-text" id="progressText">Шаг 1 из 6</div>
+                    <div class="progress-text" id="progressText" style="text-align: center; color: var(--text-secondary);">Шаг 1 из 6</div>
                 </div>
 
                 <!-- Lesson content -->
-                <div class="lesson-content-container">
-                    <h2 id="lessonTitle">Загрузка урока...</h2>
-                    
+                <div class="glass-card" style="padding: 2rem;">
+                    <h2 id="lessonTitle" style="text-align: center; margin-bottom: 2rem;">Загрузка урока...</h2>
+
                     <div id="lessonContent">
                         <!-- Content will be loaded dynamically -->
                     </div>
-                    
-                    <div class="lesson-navigation">
+
+                    <div style="display: flex; justify-content: space-between; margin-top: 2rem; flex-wrap: wrap; gap: 1rem;">
                         <button id="prevButton" class="btn btn-secondary">Назад</button>
                         <button id="nextButton" class="btn btn-primary">Далее</button>
                     </div>

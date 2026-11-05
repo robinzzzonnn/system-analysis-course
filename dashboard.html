@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | Системный анализ с нуля</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/icons.css">
 </head>
 <body>
     <header class="header">
@@ -23,19 +24,20 @@
     </header>
 
     <main class="main">
-        <section class="dashboard-section">
+        <section style="padding: 3rem 0;">
             <div class="container">
-                <h2>Личный кабинет</h2>
-                <div class="welcome-message">
-                    <p>Добро пожаловать, <span id="userName">Аналитик</span>!</p>
-                    <p>Продолжайте обучение, изучая материалы курса.</p>
+                <h2 class="section-title">Личный кабинет</h2>
+                <div style="text-align: center; margin-bottom: 3rem; padding: 2rem; background: rgba(255, 255, 255, 0.03); border-radius: var(--radius); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08);">
+                    <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">Добро пожаловать, <span id="userName" style="color: var(--accent-blue); font-weight: 800;">Аналитик</span>!</p>
+                    <p style="color: var(--text-secondary);">Продолжайте обучение, изучая материалы курса.</p>
                 </div>
 
-                <div class="lessons-section">
-                    <h3>Материалы курса</h3>
-                    <div class="lessons-list" id="lessonsContainer">
-                        <!-- Lessons will be loaded dynamically -->
-                    </div>
+                <div style="margin-bottom: 2rem;">
+                    <h3 class="section-title" style="font-size: 2rem;">Материалы курса</h3>
+                </div>
+
+                <div id="lessonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+                    <!-- Lessons will be loaded dynamically -->
                 </div>
             </div>
         </section>

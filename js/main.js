@@ -26,16 +26,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const errorEl = createErrorEl(loginForm);
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
         if (!email || !password) {
           errorEl.textContent = 'Заполните все поля';
           return;
         }
+        
+        // Show loading indicator
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span>Вход...';
+        
         try {
           const data = await apiLogin(email, password);
           saveToken(data.token, { name: data.name, email: data.email });
           window.location.href = 'choose.html';
         } catch (err) {
           errorEl.textContent = err.message;
+        } finally {
+          // Restore button state
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
         }
       });
     }
@@ -50,6 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         const errorEl = createErrorEl(registerForm);
+        const submitBtn = registerForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
         if (password !== confirmPassword) {
           errorEl.textContent = 'Пароли не совпадают';
           return;
@@ -58,6 +73,11 @@ document.addEventListener('DOMContentLoaded', function() {
           errorEl.textContent = 'Заполните все поля';
           return;
         }
+        
+        // Show loading indicator
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span>Регистрация...';
+        
         try {
           await apiRegister(email, password, name);
           const data = await apiLogin(email, password);
@@ -65,6 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
           window.location.href = 'choose.html';
         } catch (err) {
           errorEl.textContent = err.message;
+        } finally {
+          // Restore button state
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
         }
       });
     }
@@ -126,35 +150,60 @@ function loadLessons() {
         .then(data => {
             const lessonsContainer = document.getElementById('lessonsContainer');
             const lessons = data.lessons;
-            
+
             lessonsContainer.innerHTML = '';
-            
+
             lessons.forEach((lesson, index) => {
                 // Check if previous lesson is completed to unlock next one
                 const isUnlocked = index === 0 || isLessonCompleted(index);
-                
+
+                // Create glass card for lesson
                 const lessonCard = document.createElement('div');
-                lessonCard.className = 'lesson-card';
-                lessonCard.innerHTML = `
-                    <div class="lesson-number">${lesson.id}</div>
-                    <div class="lesson-content">
-                        <h4>${lesson.title}</h4>
-                        <p>${getLessonDescription(lesson.id)}</p>
-                    </div>
-                    <div class="lesson-status">
-                        <span class="status ${getLessonStatusClass(lesson.id, isUnlocked)}">
-                            ${getLessonStatusText(lesson.id, isUnlocked)}
-                        </span>
-                    </div>
-                `;
+                lessonCard.className = 'glass-card';
+                lessonCard.style.cursor = isUnlocked ? 'pointer' : 'not-allowed';
+                lessonCard.style.transition = 'var(--transition)';
                 
+                // Add hover effect for unlocked lessons
                 if (isUnlocked) {
-                    lessonCard.style.cursor = 'pointer';
+                    lessonCard.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                        this.style.boxShadow = '0 20px 40px -20px rgba(0,0,0,0.5)';
+                    });
+                    
+                    lessonCard.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 20px 40px -20px rgba(0,0,0,0.5)';
+                    });
+                    
                     lessonCard.addEventListener('click', () => {
                         window.location.href = `lesson.html?id=${lesson.id}`;
                     });
                 }
+
+                // Determine status and badge style
+                const statusText = getLessonStatusText(lesson.id, isUnlocked);
+                let statusBadge = '';
                 
+                if (isLessonCompleted(lesson.id)) {
+                    statusBadge = `<span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(16, 185, 129, 0.5); box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);">Завершён</span>`;
+                } else if (isUnlocked) {
+                    statusBadge = `<span style="background: rgba(14, 165, 233, 0.2); color: #0ea5e9; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(14, 165, 233, 0.5); box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);">Доступен</span>`;
+                } else {
+                    statusBadge = `<span style="background: rgba(107, 114, 128, 0.2); color: #94a3b8; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(107, 114, 128, 0.5);">Заблокирован</span>`;
+                }
+
+                lessonCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem;">${lesson.title}</h3>
+                            <p style="color: var(--text-secondary);">${getLessonDescription(lesson.id)}</p>
+                        </div>
+                        <div style="flex-shrink: 0; margin-left: 1rem;">
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+
                 lessonsContainer.appendChild(lessonCard);
             });
         })
@@ -274,35 +323,54 @@ function displayLessonStep() {
 // Render task step (question with options)
 function renderTaskStep(step, container, nextButton) {
     container.innerHTML = `
-        <div class="lesson-question">
-            <h3>${step.question}</h3>
-            <div class="options-container" id="optionsContainer">
+        <div style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem; color: white;">${step.question}</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;" id="optionsContainer">
                 ${step.options.map((option, index) => `
-                    <button class="option-button" data-index="${index}">
+                    <button class="option-button" data-index="${index}" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.2rem; text-align: left; color: white; font-family: 'Manrope', sans-serif; font-size: 1rem; transition: var(--transition); backdrop-filter: blur(10px);">
                         ${String.fromCharCode(65 + index)}. ${option}
                     </button>
                 `).join('')}
             </div>
         </div>
     `;
-    
+
     // Add event listeners to options
     const optionButtons = container.querySelectorAll('.option-button');
     optionButtons.forEach(button => {
+        // Add hover effect
+        button.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(14, 165, 233, 0.1)';
+            this.style.borderColor = 'var(--accent-blue)';
+            this.style.boxShadow = '0 0 15px rgba(14, 165, 233, 0.3)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.05)';
+            this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            this.style.boxShadow = 'none';
+        });
+
         button.addEventListener('click', function() {
             // Remove selected class from all buttons
-            optionButtons.forEach(btn => btn.classList.remove('selected'));
-            
-            // Add selected class to clicked button
-            this.classList.add('selected');
-            
+            optionButtons.forEach(btn => {
+                btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                btn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                btn.style.boxShadow = 'none';
+            });
+
+            // Add selected style to clicked button
+            this.style.background = 'rgba(14, 165, 233, 0.2)';
+            this.style.borderColor = 'var(--accent-blue)';
+            this.style.boxShadow = '0 0 15px rgba(14, 165, 233, 0.5)';
+
             // Enable next button
             nextButton.disabled = false;
             nextButton.textContent = 'Проверить ответ';
             nextButton.onclick = () => checkAnswer(step, parseInt(this.dataset.index));
         });
     });
-    
+
     nextButton.disabled = true;
     nextButton.textContent = 'Выберите ответ';
     nextButton.onclick = null;

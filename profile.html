@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль | Системный анализ с нуля</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/icons.css">
 </head>
 <body>
     <header class="header">
@@ -23,26 +24,28 @@
     </header>
 
     <main class="main">
-        <section class="dashboard-section">
+        <section style="padding: 3rem 0;">
             <div class="container">
-                <h2>Профиль пользователя</h2>
-                
-                <div class="profile-form-container">
-                    <form id="profileForm" class="profile-form">
-                        <div class="form-group">
-                            <label for="name">Имя</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                            <button type="button" id="cancelBtn" class="btn btn-secondary">Отмена</button>
-                        </div>
-                        <div id="messageContainer" class="form-message"></div>
-                    </form>
+                <h2 class="section-title">Профиль пользователя</h2>
+
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div class="glass-card">
+                        <form id="profileForm">
+                            <div class="form-group">
+                                <label for="name">Имя</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                                <button type="button" id="cancelBtn" class="btn btn-secondary">Отмена</button>
+                            </div>
+                            <div id="messageContainer" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px; text-align: center;"></div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
@@ -75,30 +78,34 @@
             const cancelBtn = document.getElementById('cancelBtn');
             const nameInput = document.getElementById('name');
             const emailInput = document.getElementById('email');
-            
+
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
+
                 // Store original button text
                 const originalBtnText = saveBtn.textContent;
-                
+
                 // Disable all inputs and show loading state
                 saveBtn.disabled = true;
                 saveBtn.innerHTML = '<span class="spinner"></span>Сохранение...';
                 cancelBtn.disabled = true;
                 nameInput.disabled = true;
                 emailInput.disabled = true;
-                
+
                 try {
                     const result = await apiUpdateProfile(nameInput.value, emailInput.value);
-                    messageContainer.className = 'form-message success';
+                    messageContainer.style.background = 'rgba(16, 185, 129, 0.1)';
+                    messageContainer.style.border = '1px solid var(--success)';
+                    messageContainer.style.color = 'var(--success)';
                     messageContainer.textContent = 'Профиль обновлён';
-                    
+
                     // Update displayed user info in case of changes
                     nameInput.value = result.name;
                     emailInput.value = result.email;
                 } catch (error) {
-                    messageContainer.className = 'form-message error';
+                    messageContainer.style.background = 'rgba(239, 68, 68, 0.1)';
+                    messageContainer.style.border = '1px solid var(--danger)';
+                    messageContainer.style.color = 'var(--danger)';
                     messageContainer.textContent = error.message;
                 } finally {
                     // Re-enable all inputs and restore button
@@ -114,7 +121,8 @@
             document.getElementById('cancelBtn').addEventListener('click', function() {
                 nameInput.value = user.name;
                 emailInput.value = user.email;
-                messageContainer.className = 'form-message';
+                messageContainer.style.background = 'none';
+                messageContainer.style.border = 'none';
                 messageContainer.textContent = '';
             });
         });

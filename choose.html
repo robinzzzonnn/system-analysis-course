@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Выбор режима | Системный анализ с нуля</title>
+    <title>Выбор пути — Системный анализ</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/icons.css">
 </head>
 <body>
     <header class="header">
@@ -23,52 +24,60 @@
     </header>
 
     <main class="main">
-        <section class="dashboard-section">
+        <section style="padding: 3rem 0;">
             <div class="container">
-                <h2>Куда хочешь пойти?</h2>
-                
-                <div class="lessons-section">
-                    <div class="lessons-list">
-                        <!-- Course Card -->
-                        <div class="lesson-card" style="cursor: pointer;" onclick="window.location.href='dashboard.html'">
-                            <div class="lesson-content">
-                                <h4>Курс</h4>
-                                <p>Теоретическая база: 5 уроков с заданиями и теорией</p>
-                            </div>
-                            <div class="lesson-status">
-                                <button class="btn btn-primary">Перейти к курсу</button>
-                            </div>
+                <h2 class="section-title">Куда хочешь пойти?</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <!-- Course Card -->
+                    <a href="dashboard.html" class="glass-card" style="text-decoration: none; display: block; transition: var(--transition);">
+                        <div style="text-align: center;">
+                            <div class="icon icon--course icon-large" style="margin: 0 auto 1.5rem;"></div>
+                            <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem; color: white;">Курс</h3>
+                            <ul style="text-align: left; color: var(--text-secondary); margin-bottom: 2rem; padding-left: 1.5rem;">
+                                <li style="margin-bottom: 0.8rem;">5 интерактивных уроков</li>
+                                <li style="margin-bottom: 0.8rem;">Теория и практика</li>
+                                <li style="margin-bottom: 0.8rem;">Тестирование знаний</li>
+                                <li style="margin-bottom: 0.8rem;">Сертификат по окончании</li>
+                            </ul>
+                            <button class="btn btn-primary" style="width: 100%;">Перейти к курсу</button>
                         </div>
-                        
-                        <!-- Simulator Card -->
-                        <div class="lesson-card" style="cursor: pointer;" onclick="window.location.href='simulator.html'">
-                            <div class="lesson-content">
-                                <h4>Тренажёр</h4>
-                                <p>Симуляция реальных проектов: сбор требований, документирование</p>
-                            </div>
-                            <div class="lesson-status">
-                                <button class="btn btn-primary">Перейти к тренажёру</button>
-                            </div>
+                    </a>
+
+                    <!-- Simulator Card -->
+                    <a href="simulator.html" class="glass-card" style="text-decoration: none; display: block; transition: var(--transition);">
+                        <div style="text-align: center;">
+                            <div class="icon icon--simulator icon-large" style="margin: 0 auto 1.5rem;"></div>
+                            <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem; color: white;">Тренажёр</h3>
+                            <ul style="text-align: left; color: var(--text-secondary); margin-bottom: 2rem; padding-left: 1.5rem;">
+                                <li style="margin-bottom: 0.8rem;">12 реальных сценариев</li>
+                                <li style="margin-bottom: 0.8rem;">Сбор требований</li>
+                                <li style="margin-bottom: 0.8rem;">Документирование</li>
+                                <li style="margin-bottom: 0.8rem;">Практика навыков аналитика</li>
+                            </ul>
+                            <button class="btn btn-primary" style="width: 100%;">Перейти к тренажёру</button>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
-        </div>
-    </footer>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
 
     <script>
-        // Logout functionality
-        document.getElementById('logoutLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
+        // Add hover effect for entire card
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 20px 40px -20px rgba(0,0,0,0.5)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 20px 40px -20px rgba(0,0,0,0.5)';
+            });
         });
     </script>
 </body>

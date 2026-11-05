@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Use Case Диаграмма Редактор</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/icons.css">
     <style>
         * {
             margin: 0;
@@ -12,10 +14,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Manrope', sans-serif;
             height: 100vh;
             overflow: hidden;
-            background-color: #f5f5f5;
+            background-color: #050814;
         }
 
         .container {
@@ -26,38 +28,43 @@
         /* Toolbar Styles */
         .toolbar {
             width: 250px;
-            background-color: #2c3e50;
+            background: rgba(5, 8, 20, 0.8);
             color: white;
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
 
         .toolbar h2 {
             text-align: center;
             margin-bottom: 10px;
             color: #ecf0f1;
+            font-weight: 800;
         }
 
         .tool-btn {
-            background-color: #3498db;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
             color: white;
             border: none;
             padding: 12px 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            transition: var(--transition);
             text-align: left;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: 600;
         }
 
         .tool-btn:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
 
         .tool-btn i {
@@ -65,19 +72,19 @@
         }
 
         .tool-btn.delete {
-            background-color: #e74c3c;
+            background: linear-gradient(90deg, #ef4444, #dc2626);
         }
 
         .tool-btn.delete:hover {
-            background-color: #c0392b;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
         }
 
         .tool-btn.clear {
-            background-color: #f39c12;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
         }
 
         .tool-btn.clear:hover {
-            background-color: #d35400;
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
         }
 
         /* Canvas Area */
@@ -85,16 +92,16 @@
             flex: 1;
             position: relative;
             overflow: hidden;
-            background-color: white;
+            background-color: #050814;
         }
 
         #svgCanvas {
             width: 100%;
             height: 100%;
-            background-color: #fafafa;
-            background-image: 
-                radial-gradient(#e0e0e0 1px, transparent 1px),
-                radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-color: #050814;
+            background-image:
+                radial-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+                radial-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px);
             background-size: 20px 20px;
             background-position: 0 0, 10px 10px;
         }
@@ -106,17 +113,18 @@
         }
 
         .actor.stickman {
-            fill: #3498db;
-            stroke: #2980b9;
+            fill: #0ea5e9;
+            stroke: #0284c7;
             stroke-width: 2;
         }
 
         .actor-label {
-            font-family: Arial, sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-size: 14px;
             text-anchor: middle;
-            fill: #2c3e50;
+            fill: #f1f5f9;
             pointer-events: none;
+            font-weight: 600;
         }
 
         .usecase {
@@ -125,22 +133,23 @@
         }
 
         .usecase.ellipse {
-            fill: #2ecc71;
-            stroke: #27ae60;
+            fill: #8b5cf6;
+            stroke: #7c3aed;
             stroke-width: 2;
         }
 
         .usecase-label {
-            font-family: Arial, sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-size: 14px;
             text-anchor: middle;
             dominant-baseline: middle;
-            fill: #2c3e50;
+            fill: #f1f5f9;
             pointer-events: none;
+            font-weight: 600;
         }
 
         .connection {
-            stroke: #e74c3c;
+            stroke: #ef4444;
             stroke-width: 2;
             marker-end: url(#arrowhead);
         }
@@ -148,14 +157,15 @@
         /* Edit Input */
         .edit-input {
             position: absolute;
-            background: white;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            padding: 5px;
+            background: rgba(5, 8, 20, 0.9);
+            border: 2px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 8px 12px;
             font-size: 14px;
-            font-family: Arial, sans-serif;
+            font-family: 'Manrope', sans-serif;
             outline: none;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            color: white;
         }
 
         /* Status Bar */
@@ -165,14 +175,35 @@
             left: 10px;
             background: rgba(0,0,0,0.7);
             color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 8px 15px;
+            border-radius: 8px;
             font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
         }
 
         /* Selected Element */
         .selected {
-            filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.8));
+            filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.8));
+        }
+
+        /* Header */
+        .editor-header {
+            position: absolute;
+            top: 0;
+            left: 250px;
+            right: 0;
+            background: rgba(5, 8, 20, 0.8);
+            padding: 15px 20px;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 10;
+        }
+
+        .editor-header h1 {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 800;
         }
     </style>
 </head>
@@ -182,29 +213,34 @@
         <div class="toolbar">
             <h2>Use Case Редактор</h2>
             <button class="tool-btn" id="addActorBtn">
-                <span>👤</span> Добавить актёра
+                <span class="icon icon--practice"></span> Добавить актёра
             </button>
             <button class="tool-btn" id="addUsecaseBtn">
-                <span>⭕</span> Добавить Use Case
+                <span class="icon icon-- requirements"></span> Добавить Use Case
             </button>
             <button class="tool-btn" id="connectBtn">
-                <span>🔗</span> Связать элементы
+                <span class="icon icon--interactive"></span> Связать элементы
             </button>
             <button class="tool-btn delete" id="deleteBtn">
-                <span>🗑️</span> Удалить
+                <span class="icon icon--simulator"></span> Удалить
             </button>
             <button class="tool-btn clear" id="clearBtn">
-                <span>🧹</span> Очистить всё
+                <span class="icon icon--portfolio"></span> Очистить всё
             </button>
-            <div style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px;">
-                <h4>Инструкция:</h4>
-                <ul style="font-size: 12px; margin-left: 15px; margin-top: 5px;">
-                    <li>Добавьте элементы кнопками</li>
-                    <li>Перетаскивайте мышкой</li>
-                    <li>Двойной клик — редактировать</li>
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                <h4 style="margin-bottom: 10px; color: #94a3b8;">Инструкция:</h4>
+                <ul style="font-size: 12px; margin-left: 15px; margin-top: 5px; color: #94a3b8;">
+                    <li style="margin-bottom: 8px;">Добавьте элементы кнопками</li>
+                    <li style="margin-bottom: 8px;">Перетаскивайте мышкой</li>
+                    <li style="margin-bottom: 8px;">Двойной клик — редактировать</li>
                     <li>Выделите и нажмите "Связать"</li>
                 </ul>
             </div>
+        </div>
+
+        <!-- Header -->
+        <div class="editor-header">
+            <h1>Редактор Use Case диаграмм</h1>
         </div>
 
         <!-- Canvas Area -->
@@ -230,25 +266,29 @@
         document.addEventListener('DOMContentLoaded', function() {
             const svg = document.getElementById('svgCanvas');
             const statusBar = document.getElementById('statusBar');
-            
+
+            // Set canvas size
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+
             // Create arrow marker for connections
             createArrowMarker();
-            
+
             // Setup toolbar events
             document.getElementById('addActorBtn').addEventListener('click', addActor);
             document.getElementById('addUsecaseBtn').addEventListener('click', addUsecase);
             document.getElementById('connectBtn').addEventListener('click', startConnecting);
             document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
             document.getElementById('clearBtn').addEventListener('click', clearCanvas);
-            
+
             // Setup canvas events
             svg.addEventListener('mousedown', handleCanvasMouseDown);
             svg.addEventListener('dblclick', handleCanvasDoubleClick);
-            
+
             // Setup drag events
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
-            
+
             updateStatusBar('Готово');
         });
 
@@ -256,7 +296,7 @@
         function createArrowMarker() {
             const svg = document.getElementById('svgCanvas');
             const defs = document.createElementNS(svgNS, 'defs');
-            
+
             const marker = document.createElementNS(svgNS, 'marker');
             marker.setAttribute('id', 'arrowhead');
             marker.setAttribute('markerWidth', '10');
@@ -264,11 +304,11 @@
             marker.setAttribute('refX', '10');
             marker.setAttribute('refY', '3.5');
             marker.setAttribute('orient', 'auto');
-            
+
             const polygon = document.createElementNS(svgNS, 'polygon');
             polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
-            polygon.setAttribute('fill', '#e74c3c');
-            
+            polygon.setAttribute('fill', '#ef4444');
+
             marker.appendChild(polygon);
             defs.appendChild(marker);
             svg.appendChild(defs);
@@ -284,62 +324,62 @@
             const svg = document.getElementById('svgCanvas');
             const centerX = svg.clientWidth / 2;
             const centerY = svg.clientHeight / 2;
-            
+
             const groupId = 'actor_' + elementCounter++;
             const group = document.createElementNS(svgNS, 'g');
             group.setAttribute('id', groupId);
             group.setAttribute('class', 'actor');
             group.setAttribute('transform', `translate(${centerX}, ${centerY})`);
-            
+
             // Create stickman
             const head = document.createElementNS(svgNS, 'circle');
             head.setAttribute('cx', 0);
             head.setAttribute('cy', -20);
             head.setAttribute('r', 10);
             head.setAttribute('class', 'stickman');
-            
+
             const body = document.createElementNS(svgNS, 'line');
             body.setAttribute('x1', 0);
             body.setAttribute('y1', -10);
             body.setAttribute('x2', 0);
             body.setAttribute('y2', 20);
             body.setAttribute('class', 'stickman');
-            
+
             const leftArm = document.createElementNS(svgNS, 'line');
             leftArm.setAttribute('x1', 0);
             leftArm.setAttribute('y1', 0);
             leftArm.setAttribute('x2', -15);
             leftArm.setAttribute('y2', 10);
             leftArm.setAttribute('class', 'stickman');
-            
+
             const rightArm = document.createElementNS(svgNS, 'line');
             rightArm.setAttribute('x1', 0);
             rightArm.setAttribute('y1', 0);
             rightArm.setAttribute('x2', 15);
             rightArm.setAttribute('y2', 10);
             rightArm.setAttribute('class', 'stickman');
-            
+
             const leftLeg = document.createElementNS(svgNS, 'line');
             leftLeg.setAttribute('x1', 0);
             leftLeg.setAttribute('y1', 20);
             leftLeg.setAttribute('x2', -15);
             leftLeg.setAttribute('y2', 35);
             leftLeg.setAttribute('class', 'stickman');
-            
+
             const rightLeg = document.createElementNS(svgNS, 'line');
             rightLeg.setAttribute('x1', 0);
             rightLeg.setAttribute('y1', 20);
             rightLeg.setAttribute('x2', 15);
             rightLeg.setAttribute('y2', 35);
             rightLeg.setAttribute('class', 'stickman');
-            
+
             // Create label
             const label = document.createElementNS(svgNS, 'text');
             label.setAttribute('x', 0);
             label.setAttribute('y', 50);
             label.setAttribute('class', 'actor-label');
             label.textContent = 'Актёр ' + groupId.split('_')[1];
-            
+
             group.appendChild(head);
             group.appendChild(body);
             group.appendChild(leftArm);
@@ -347,9 +387,9 @@
             group.appendChild(leftLeg);
             group.appendChild(rightLeg);
             group.appendChild(label);
-            
+
             svg.appendChild(group);
-            
+
             // Store element info
             elements.push({
                 id: groupId,
@@ -359,7 +399,7 @@
                 y: centerY,
                 label: 'Актёр ' + groupId.split('_')[1]
             });
-            
+
             updateStatusBar('Добавлен актёр');
         }
 
@@ -368,13 +408,13 @@
             const svg = document.getElementById('svgCanvas');
             const centerX = svg.clientWidth / 2;
             const centerY = svg.clientHeight / 2;
-            
+
             const groupId = 'usecase_' + elementCounter++;
             const group = document.createElementNS(svgNS, 'g');
             group.setAttribute('id', groupId);
             group.setAttribute('class', 'usecase');
             group.setAttribute('transform', `translate(${centerX}, ${centerY})`);
-            
+
             // Create ellipse
             const ellipse = document.createElementNS(svgNS, 'ellipse');
             ellipse.setAttribute('cx', 0);
@@ -382,19 +422,19 @@
             ellipse.setAttribute('rx', 60);
             ellipse.setAttribute('ry', 30);
             ellipse.setAttribute('class', 'usecase ellipse');
-            
+
             // Create label
             const label = document.createElementNS(svgNS, 'text');
             label.setAttribute('x', 0);
             label.setAttribute('y', 0);
             label.setAttribute('class', 'usecase-label');
             label.textContent = 'Use Case ' + groupId.split('_')[1];
-            
+
             group.appendChild(ellipse);
             group.appendChild(label);
-            
+
             svg.appendChild(group);
-            
+
             // Store element info
             elements.push({
                 id: groupId,
@@ -404,7 +444,7 @@
                 y: centerY,
                 label: 'Use Case ' + groupId.split('_')[1]
             });
-            
+
             updateStatusBar('Добавлен Use Case');
         }
 
@@ -424,10 +464,10 @@
             if (selectedElement) {
                 // Remove from DOM
                 selectedElement.element.remove();
-                
+
                 // Remove from elements array
                 elements = elements.filter(el => el.id !== selectedElement.id);
-                
+
                 // Remove connections associated with this element
                 const svg = document.getElementById('svgCanvas');
                 const connectionLines = svg.querySelectorAll('.connection');
@@ -437,7 +477,7 @@
                         line.remove();
                     }
                 });
-                
+
                 // Clear selection
                 selectedElement = null;
                 updateStatusBar('Элемент удалён');
@@ -452,13 +492,13 @@
                 const svg = document.getElementById('svgCanvas');
                 const elementsToRemove = svg.querySelectorAll('.actor, .usecase, .connection');
                 elementsToRemove.forEach(el => el.remove());
-                
+
                 elements = [];
                 connections = [];
                 selectedElement = null;
                 connectingMode = false;
                 connectStart = null;
-                
+
                 updateStatusBar('Холст очищен');
             }
         }
@@ -469,7 +509,7 @@
             const rect = svg.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
+
             // Check if we clicked on an element
             let clickedElement = null;
             for (let i = elements.length - 1; i >= 0; i--) {
@@ -481,7 +521,7 @@
                     break;
                 }
             }
-            
+
             if (clickedElement) {
                 // Select element
                 if (selectedElement) {
@@ -489,7 +529,7 @@
                 }
                 selectedElement = clickedElement;
                 selectedElement.element.classList.add('selected');
-                
+
                 if (connectingMode && connectStart && connectStart !== selectedElement) {
                     // Create connection
                     createConnection(connectStart, selectedElement);
@@ -504,14 +544,14 @@
                 if (selectedElement) {
                     selectedElement.element.classList.remove('selected');
                     selectedElement = null;
-                }
-                
-                if (connectingMode) {
-                    connectingMode = false;
-                    connectStart = null;
-                    updateStatusBar('Соединение отменено');
-                } else {
-                    updateStatusBar('Готово');
+
+                    if (connectingMode) {
+                        connectingMode = false;
+                        connectStart = null;
+                        updateStatusBar('Соединение отменено');
+                    } else {
+                        updateStatusBar('Готово');
+                    }
                 }
             }
         }
@@ -527,23 +567,23 @@
         function showEditInput(element, event) {
             const svg = document.getElementById('svgCanvas');
             const rect = svg.getBoundingClientRect();
-            
+
             const editInput = document.createElement('input');
             editInput.type = 'text';
             editInput.value = element.label;
             editInput.className = 'edit-input';
             editInput.style.left = (event.clientX - rect.left) + 'px';
             editInput.style.top = (event.clientY - rect.top) + 'px';
-            
+
             svg.parentNode.appendChild(editInput);
             editInput.focus();
-            
+
             // Handle input submission
             editInput.addEventListener('blur', function() {
                 updateElementLabel(element, this.value);
                 this.remove();
             });
-            
+
             editInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     updateElementLabel(element, this.value);
@@ -557,20 +597,20 @@
         // Update element label
         function updateElementLabel(element, newText) {
             element.label = newText;
-            
+
             // Update SVG text element
             const textElement = element.element.querySelector('text');
             if (textElement) {
                 textElement.textContent = newText;
             }
-            
+
             updateStatusBar('Текст обновлён');
         }
 
         // Create connection between two elements
         function createConnection(fromElement, toElement) {
             const svg = document.getElementById('svgCanvas');
-            
+
             const line = document.createElementNS(svgNS, 'line');
             line.setAttribute('class', 'connection');
             line.setAttribute('x1', fromElement.x);
@@ -579,9 +619,9 @@
             line.setAttribute('y2', toElement.y);
             line.setAttribute('data-from', fromElement.id);
             line.setAttribute('data-to', toElement.id);
-            
+
             svg.appendChild(line);
-            
+
             connections.push({
                 element: line,
                 from: fromElement.id,
@@ -596,15 +636,15 @@
                 const rect = svg.getBoundingClientRect();
                 const x = e.clientX - rect.left - offsetX;
                 const y = e.clientY - rect.top - offsetY;
-                
+
                 // Update element position
                 dragElement.element.setAttribute('transform', `translate(${x}, ${y})`);
                 dragElement.x = x;
                 dragElement.y = y;
-                
+
                 // Update connections
                 updateConnections(dragElement);
-                
+
                 updateStatusBar('Перемещение элемента');
             }
         }
@@ -621,7 +661,7 @@
         function updateConnections(element) {
             const svg = document.getElementById('svgCanvas');
             const connectionLines = svg.querySelectorAll('.connection');
-            
+
             connectionLines.forEach(line => {
                 const data = line.dataset;
                 if (data.from === element.id) {
@@ -644,12 +684,12 @@
                     const element = elements.find(el => el.id === elementId);
                     if (element) {
                         dragElement = element;
-                        
+
                         const svg = document.getElementById('svgCanvas');
                         const rect = svg.getBoundingClientRect();
                         offsetX = e.clientX - rect.left - element.x;
                         offsetY = e.clientY - rect.top - element.y;
-                        
+
                         // Bring to front
                         elementGroup.parentNode.appendChild(elementGroup);
                     }

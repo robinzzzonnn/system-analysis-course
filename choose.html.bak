@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор режима | Системный анализ с нуля</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Системный анализ с нуля</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="dashboard.html" class="nav-link">Курс</a>
+                <a href="simulator.html" class="nav-link">Тренажёр</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+                <a href="#" class="nav-link" id="logoutLink">Выход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="dashboard-section">
+            <div class="container">
+                <h2>Куда хочешь пойти?</h2>
+
+                <div class="choice-container">
+                    <!-- Course Card -->
+                    <a href="dashboard.html" class="choice-card">
+                        <div class="choice-icon">📚</div>
+                        <h3>Курс</h3>
+                        <p>Теоретическая база: 5 уроков с заданиями и теорией</p>
+                    </a>
+
+                    <!-- Simulator Card -->
+                    <a href="simulator.html" class="choice-card">
+                        <div class="choice-icon">🎮</div>
+                        <h3>Тренажёр</h3>
+                        <p>Симуляция реальных проектов: сбор требований, документирование</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Курс "Системный анализ с нуля". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
