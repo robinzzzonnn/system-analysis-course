@@ -1,0 +1,43 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: System Analysis API
+x-yc-apigateway:
+  service_account_id: aje5n9e8m2eddjn7rsev
+
+paths:
+  /api/me:
+    get:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e1gouf9gl5glgmcmh1
+        tag: "$latest"
+        service_account_id: aje5n9e8m2eddjn7rsev
+        payload_format_version: '0.1'
+
+  /api/login:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e1gouf9gl5glgmcmh1
+        tag: "$latest"
+        service_account_id: aje5n9e8m2eddjn7rsev
+        payload_format_version: '0.1'
+
+  /api/register:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e1gouf9gl5glgmcmh1
+        tag: "$latest"
+        service_account_id: aje5n9e8m2eddjn7rsev
+        payload_format_version: '0.1'
+
+  /api/profile:
+    put:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e1gouf9gl5glgmcmh1
+        tag: "$latest"
+        service_account_id: aje5n9e8m2eddjn7rsev
+        payload_format_version: '0.1'

@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+const API_URL = 'https://d5dtqdjvma0bj8jn8kdr.4kscn31j.apigw.yandexcloud.net';
 
 function saveToken(token, user) {
   localStorage.setItem('auth_token', token);
