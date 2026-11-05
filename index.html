@@ -90,6 +90,18 @@
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+        <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Проверяем, есть ли токен в localStorage
+            const token = localStorage.getItem('auth_token');
+            
+            if (token) {
+                // Если токен есть, идём на страницу выбора (Курс или Симулятор)
+                window.location.href = 'choose.html';
+            }
+            // Если токена нет, ничего не делаем — пользователь остаётся на главной
+        });
+    </script>
 </body>
 </html>
