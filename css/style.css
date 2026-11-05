@@ -67,7 +67,6 @@
     margin-right: 8px;
     vertical-align: middle;
 }
-}
 
 .animated {
     animation-duration: 0.6s;
@@ -78,25 +77,11 @@
     animation-name: fadeInUp;
 }
 
-.delay-1 {
-    animation-delay: 0.1s;
-}
-
-.delay-2 {
-    animation-delay: 0.2s;
-}
-
-.delay-3 {
-    animation-delay: 0.3s;
-}
-
-.delay-4 {
-    animation-delay: 0.4s;
-}
-
-.delay-5 {
-    animation-delay: 0.5s;
-}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
 
 * {
     margin: 0;
@@ -749,12 +734,6 @@ body {
     color: #64748b;
     font-size: 0.9rem;
     margin-top: 0.75rem;
-}
-
-.svg-caption {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-top: 0.5rem;
 }
 
 /* Usecase Editor */
